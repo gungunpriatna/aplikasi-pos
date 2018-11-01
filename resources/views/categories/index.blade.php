@@ -1,9 +1,9 @@
 @extends('layouts.master')
-​
+
 @section('title')
     <title>Manajemen Kategori</title>
 @endsection
-​
+
 @section('content')
     <div class="content-wrapper">
         <div class="content-header">
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-​
+
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -36,7 +36,7 @@
                                     {!! session('error') !!}
                                 @endalert
                             @endif
-​
+
                             <form role="form" action="{{ route('kategori.store') }}" method="POST">
                                 @csrf
                                 <div class="form-group">
@@ -104,7 +104,7 @@
                                 </table>
                             </div>
                             @slot('footer')
-​
+
                             @endslot
                         @endcard
                     </div>
