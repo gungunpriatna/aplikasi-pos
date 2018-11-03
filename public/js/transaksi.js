@@ -13649,14 +13649,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-//import sweetalert library
-
 
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.filter('currency', function (money) {
     return accounting.formatMoney(money, "Rp ", 2, ".", ",");
 });
-
-//use sweetalert
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vue_sweetalert2__["a" /* default */]);
 
 new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
@@ -13684,11 +13680,8 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
         message: ''
     },
     watch: {
-        //apabila nilai dari product > id berubah maka
-        'product.id': function productId() {
-            //mengecek jika nilai dari product > id ada
-            if (this.product.id) {
-                //maka akan menjalankan methods getProduct
+        'cart.product_id': function cartProduct_id() {
+            if (this.cart.product_id) {
                 this.getProduct();
             }
         },
@@ -13702,21 +13695,15 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
                 };
             }
         }
-
     },
-    //menggunakan library select2 ketika file ini di-load
     mounted: function mounted() {
         var _this = this;
 
         $('#product_id').select2({
             width: '100%'
         }).on('change', function () {
-            //apabila terjadi perubahan nilai yg dipilih maka nilai tersebut 
-            //akan disimpan di dalam var product > id
-            _this.product.id = $('#product_id').val();
+            _this.cart.product_id = $('#product_id').val();
         });
-
-        //memanggil method getCart() untuk me-load cookie cart
         this.getCart();
     },
 
@@ -13724,28 +13711,17 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
         getProduct: function getProduct() {
             var _this2 = this;
 
-            //fetch ke server menggunakan axios dengan mengirimkan parameter id
-            //dengan url /api/product/{id}
-            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/api/product/' + this.product.id).then(function (response) {
-                //assign data yang diterima dari server ke var product
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/api/product/' + this.cart.product_id).then(function (response) {
                 _this2.product = response.data;
             });
         },
-
-
-        //method untuk menambahkan product yang dipilih ke dalam cart
         addToCart: function addToCart() {
             var _this3 = this;
 
             this.submitCart = true;
-
-            //send data ke server
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/api/cart', this.cart).then(function (response) {
                 setTimeout(function () {
-                    //apabila berhasil, data disimpan ke dalam var shoppingCart
                     _this3.shoppingCart = response.data;
-
-                    //mengosongkan var
                     _this3.cart.product_id = '';
                     _this3.cart.qty = 1;
                     _this3.product = {
@@ -13759,25 +13735,16 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
                 }, 2000);
             }).catch(function (error) {});
         },
-
-
-        //mengambil list cart yang telah disimpan
         getCart: function getCart() {
             var _this4 = this;
 
-            //fetch data ke server
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/api/cart').then(function (response) {
-                //data yang diterima disimpan ke dalam var shoppingCart
                 _this4.shoppingCart = response.data;
             });
         },
-
-
-        //menghapus cart
         removeCart: function removeCart(id) {
             var _this5 = this;
 
-            //menampilkan konfirmasi dengan sweetalert
             this.$swal({
                 title: 'Kamu Yakin?',
                 text: 'Kamu Tidak Dapat Mengembalikan Tindakan Ini!',
@@ -13798,11 +13765,8 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
                     return !_this5.$swal.isLoading();
                 }
             }).then(function (result) {
-                //apabila disetujui
                 if (result.value) {
-                    //kirim data ke server
                     __WEBPACK_IMPORTED_MODULE_1_axios___default.a.delete('/api/cart/' + id).then(function (response) {
-                        //load cart yang baru
                         _this5.getCart();
                     }).catch(function (error) {
                         console.log(error);
@@ -13823,18 +13787,12 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
                 _this6.formCustomer = true;
             }).catch(function (error) {});
         },
-
-        // method sendOrder() kita biarkan kosong terlebih dahulu, section selanjutnya akan di modifikasi
         sendOrder: function sendOrder() {
             var _this7 = this;
 
-            //Mengosongkan var errorMessage dan message
             this.errorMessage = '';
             this.message = '';
-
-            //jika var customer.email dan kawan-kawannya tidak kosong
             if (this.customer.email != '' && this.customer.name != '' && this.customer.phone != '' && this.customer.address != '') {
-                //maka akan menampilkan kotak dialog konfirmasi
                 this.$swal({
                     title: 'Kamu Yakin?',
                     text: 'Kamu Tidak Dapat Mengembalikan Tindakan Ini!',
@@ -13855,24 +13813,18 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
                         return !_this7.$swal.isLoading();
                     }
                 }).then(function (result) {
-                    //jika di setujui
                     if (result.value) {
-                        //maka submitForm akan di-set menjadi true sehingga menciptakan efek loading
                         _this7.submitForm = true;
-                        //mengirimkan data dengan uri /checkout
                         __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/checkout', _this7.customer).then(function (response) {
                             setTimeout(function () {
-                                //jika responsenya berhasil, maka cart di-reload
                                 _this7.getCart();
-                                //message di-set untuk ditampilkan
                                 _this7.message = response.data.message;
-                                //form customer dikosongkan
                                 _this7.customer = {
                                     name: '',
                                     phone: '',
                                     address: ''
-                                    //submitForm kembali di-set menjadi false
-                                };_this7.submitForm = false;
+                                };
+                                _this7.submitForm = false;
                             }, 1000);
                         }).catch(function (error) {
                             console.log(error);
@@ -13880,7 +13832,6 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
                     }
                 });
             } else {
-                //jika form kosong, maka error message ditampilkan
                 this.errorMessage = 'Masih ada inputan yang kosong!';
             }
         }
