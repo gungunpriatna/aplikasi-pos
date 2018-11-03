@@ -37,8 +37,6 @@
 ​
                             <div class="row">
                                 <div class="col-md-4">
-                                    
-                                    <!-- SUBMIT DIJALANKAN KETIKA TOMBOL DITEKAN -->
                                     <form action="#" @submit.prevent="addToCart" method="post">
                                         <div class="form-group">
                                             <label for="">Produk</label>
@@ -67,8 +65,6 @@
                                         </div>
                                     </form>
                                 </div>
-                                
-                                <!-- MENAMPILKAN DETAIL PRODUCT -->
                                 <div class="col-md-5">
                                     <h4>Detail Produk</h4>
                                     <div v-if="product.name">
@@ -91,8 +87,6 @@
                                         </table>
                                     </div>
                                 </div>
-                                
-                                <!-- MENAMPILKAN IMAGE DARI PRODUCT -->
                                 <div class="col-md-3" v-if="product.photo">
                                     <img :src="'/uploads/product/' + product.photo" 
                                         height="150px" 
@@ -105,50 +99,7 @@
                             @endslot
                         @endcard
                     </div>
-                    
-                    <!-- MENAMPILKAN LIST PRODUCT YANG ADA DI KERANJANG -->
-                    <div class="col-md-4">
-                        @card
-                            @slot('title')
-                            Keranjang
-                            @endslot
-​
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Produk</th>
-                                        <th>Harga</th>
-                                        <th>Qty</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- MENGGUNAKAN LOOPING VUEJS -->
-                                    <tr v-for="(row, index) in shoppingCart">
-                                        <td>@{{ row.name }} (@{{ row.code }})</td>
-                                        <td>@{{ row.price | currency }}</td>
-                                        <td>@{{ row.qty }}</td>
-                                        <td>
-                                            <!-- EVENT ONCLICK UNTUK MENGHAPUS CART -->
-                                            <button 
-                                                @click.prevent="removeCart(index)"    
-                                                class="btn btn-danger btn-sm">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            @slot('footer')
-                            <div class="card-footer text-muted">
-                                <a href="{{ route('order.checkout') }}" 
-                                    class="btn btn-info btn-sm float-right">
-                                    Checkout
-                                </a>
-                            </div>
-                            @endslot
-                        @endcard
-                    </div>
+                    @include('orders.cart')
                 </div>
             </div>
         </section>
