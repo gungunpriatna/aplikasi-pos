@@ -11,6 +11,7 @@ use App\User;
 use Carbon\Carbon;
 use Cookie;
 use DB;
+use PDF;
 
 class OrderController extends Controller
 {
@@ -64,61 +65,7 @@ class OrderController extends Controller
         ]);
     }
 
-    private function countCustomer($orders)
-    {
-        $customer = [];
-
-        if ($orders->count() > 0) {
-            //looping untuk menyimpan email ke dalam array
-            foreach ($orders as $row) {
-                $customer[] = $row->customer->email;
-            }
-        }
-
-        //menghitung total data yang ada di dalam array
-        //di mana data yang duplicate akan dihapus menggunakan array_unique
-        return count(array_unique($customer));
-    }
-
-    private function countTotal($orders)
-    {
-        $total = 0;
-
-        if ($orders->count() > 0) {
-            //mengambil value dari total, pluck() akan mengubahnya menjadi array
-            $sub_total = $orders->pluck('total')->all();
-            //kemudian data yang ada di dalam array dijumlahkan
-            $total = array_sum($sub_total); 
-        }
-
-        return $total;
-    }
-
-    private function countItem($order)
-    {
-        $data = 0;
-
-        if ($order->count() > 0) {
-            foreach ($order as $row) {
-                $qty = $row->order_detail->pluck('qty')->all();
-                
-                $val = array_sum($qty);
-                $data += $val;
-            }
-        }
-
-        return $data;
-    }
-
-    public function invoicePdf($invoice)
-    {
-
-    }
-
-    public function invoiceExcel($invoice)
-    {
-
-    }
+    
 
     public function addOrder()
     {
@@ -280,5 +227,69 @@ class OrderController extends Controller
 
         //jika belum terdapat records maka akan me-return INV-1
         return 'INV-1';
+    }
+
+    private function countCustomer($orders)
+    {
+        $customer = [];
+
+        if ($orders->count() > 0) {
+            //looping untuk menyimpan email ke dalam array
+            foreach ($orders as $row) {
+                $customer[] = $row->customer->email;
+            }
+        }
+
+        //menghitung total data yang ada di dalam array
+        //di mana data yang duplicate akan dihapus menggunakan array_unique
+        return count(array_unique($customer));
+    }
+
+    private function countTotal($orders)
+    {
+        $total = 0;
+
+        if ($orders->count() > 0) {
+            //mengambil value dari total, pluck() akan mengubahnya menjadi array
+            $sub_total = $orders->pluck('total')->all();
+            //kemudian data yang ada di dalam array dijumlahkan
+            $total = array_sum($sub_total);
+        }
+
+        return $total;
+    }
+
+    private function countItem($order)
+    {
+        $data = 0;
+
+        if ($order->count() > 0) {
+            foreach ($order as $row) {
+                $qty = $row->order_detail->pluck('qty')->all();
+
+                $val = array_sum($qty);
+                $data += $val;
+            }
+        }
+
+        return $data;
+    }
+
+    public function invoicePdf($invoice)
+    {
+        //ambil data berdasarkan invoice
+        $order = Order::where('invoice', $invoice)
+            ->with('customer', 'order_detail', 'order_detail.product')->first();
+        
+        //set config pdf menggunakan font sans-serif
+        $pdf = PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif'])
+            ->loadView('orders.report.invoice', compact('order'));
+        
+        return $pdf->stream();
+    }
+
+    public function invoiceExcel($invoice)
+    {
+
     }
 }
