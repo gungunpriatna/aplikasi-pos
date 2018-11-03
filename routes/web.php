@@ -47,7 +47,7 @@ Route::group(['middleware' => 'auth'], function() {
 
     //route untuk kasir
     Route::group(['middleware' => ['role:kasir']], function() {
-
+        Route::get('/transaksi', 'OrderController@addOrder')->name('order.transaksi');
     });
 
     
