@@ -7,11 +7,119 @@ use App\Product;
 use App\Order;
 use App\Order_detail;
 use App\Customer;
+use App\User;
+use Carbon\Carbon;
 use Cookie;
 use DB;
 
 class OrderController extends Controller
 {
+    public function index(Request $request)
+    {
+        //ambil data customer
+        $customers = Customer::orderBy('name', 'ASC')->get();
+        //ambil data user yang memiliki role kasir
+        $users = User::role('kasir')->orderBy('name', 'ASC')->get();
+        //ambil data transaksi
+        $orders = Order::orderBy('created_at', 'DESC')->with('order_detail', 'customer');
+
+        //jika pelanggan dipilih pada combobox
+        if (!empty($request->customer_id)) {
+            $orders = $orders->where('customer_id', $request->customer_id);
+        }
+
+        //jika user / kasir dipilih pada combobox
+        if (!empty($request->user_id)) {
+            //maka tambahkan where condition
+            $orders = $orders->where('user_id', $request->user_id);
+
+        }
+
+        //jika start date dan end date terisi
+        if (!empty($request->start_date) && !empty($request->end_date)) {
+            //maka validasi di mana formatnya harus date
+            $this->validate($request, [
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date'
+            ]);
+
+            $start_date = Carbon::parse($request->start_date)->format('Y-m-ad') . ' 00:00:01';
+            $end_date = Carbon::parse($request->end_date)->format('Y-m-d') . ' 23:59:59';
+
+            //ditambahkan di wherebetwwen condition untuk ambil data
+            $orders = $orders->whereBetween('created_at', [$start_date, $end_date])->get();
+        } else {
+            //jika start date dan end date kosong, maka load 10 data terbaru
+            $orders = $orders->take(10)->skip(0)->get();
+        }
+
+        //menampilkan ke view
+        return view('orders.index', [
+            'orders' => $orders,
+            'sold' => $this->countItem($orders),
+            'total' => $this->countTotal($orders),
+            'total_customer' => $this->countCustomer($orders),
+            'customers' => $customers,
+            'users' => $users
+        ]);
+    }
+
+    private function countCustomer($orders)
+    {
+        $customer = [];
+
+        if ($orders->count() > 0) {
+            //looping untuk menyimpan email ke dalam array
+            foreach ($orders as $row) {
+                $customer[] = $row->customer->email;
+            }
+        }
+
+        //menghitung total data yang ada di dalam array
+        //di mana data yang duplicate akan dihapus menggunakan array_unique
+        return count(array_unique($customer));
+    }
+
+    private function countTotal($orders)
+    {
+        $total = 0;
+
+        if ($orders->count() > 0) {
+            //mengambil value dari total, pluck() akan mengubahnya menjadi array
+            $sub_total = $orders->pluck('total')->all();
+            //kemudian data yang ada di dalam array dijumlahkan
+            $total = array_sum($sub_total); 
+        }
+
+        return $total;
+    }
+
+    private function countItem($order)
+    {
+        $data = 0;
+
+        if ($order->count() > 0) {
+            foreach ($order as $row) {
+                $qty = $row->order_detail->pluck('qty')->all();
+                
+                $val = array_sum($qty);
+                $data += $val;
+            }
+        }
+
+        return $data;
+    }
+
+    public function invoicePdf($invoice)
+    {
+
+    }
+
+    public function invoiceExcel($invoice)
+    {
+
+    }
+
     public function addOrder()
     {
         $products = Product::orderBy('created_at', 'DESC')->get();
