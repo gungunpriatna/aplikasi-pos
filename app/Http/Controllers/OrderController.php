@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Cookie;
 use DB;
 use PDF;
+use App\Exports\OrderInvoice;
 
 class OrderController extends Controller
 {
@@ -290,6 +291,6 @@ class OrderController extends Controller
 
     public function invoiceExcel($invoice)
     {
-
+        return (new OrderInvoice($invoice))->download('invoice-' . $invoice . '.xlsx');
     }
 }
