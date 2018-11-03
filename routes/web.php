@@ -52,6 +52,12 @@ Route::group(['middleware' => 'auth'], function() {
         Route::post('/checkout', 'OrderController@storeOrder')->name('order.storeOrder');
     });
 
+    Route::group(['middleware' => ['role:kasir|admin']], function () {
+        Route::get('/order', 'OrderController@index')->name('order.index');
+        Route::get('/order/pdf/{invoice}', 'OrderController@invoicePdf')->name('order.pdf');
+        Route::get('/order/excel/{invoice}', 'OrderController@invoiceExcel')->name('order.excel');
+    });
+
     
 
     
