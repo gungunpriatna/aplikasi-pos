@@ -143,7 +143,6 @@ class OrderController extends Controller
 
     public function storeOrder(Request $request)
     {
-        //validasi
         $this->validate($request, [
             'email' => 'required|email',
             'name' => 'required|string|max:100',
@@ -151,10 +150,8 @@ class OrderController extends Controller
             'phone' => 'required|numeric'
         ]);
 
-        //mengambil list cart dari cookie
         $cart = json_decode($request->cookie('cart'), true);
-        //manipulasi array untuk menciptakan key baru yakni resul dari hasil perkalian price * qty
-        $result = collect($cart)->map(function($value) {
+        $result = collect($cart)->map(function ($value) {
             return [
                 'code' => $value['code'],
                 'name' => $value['name'],
@@ -164,10 +161,8 @@ class OrderController extends Controller
             ];
         })->all();
 
-        //database transaction
         DB::beginTransaction();
         try {
-            //simpan data ke table customers
             $customer = Customer::firstOrCreate([
                 'email' => $request->email
             ], [
@@ -176,7 +171,6 @@ class OrderController extends Controller
                 'phone' => $request->phone
             ]);
 
-            //simpan data ke table order
             $order = Order::create([
                 'invoice' => $this->generateInvoice(),
                 'customer_id' => $customer->id,
@@ -184,7 +178,6 @@ class OrderController extends Controller
                 'total' => array_sum(array_column($result, 'result'))
             ]);
 
-            //looping cart untuk disimpan ke table order_details
             foreach ($result as $key => $row) {
                 $order->order_detail()->create([
                     'product_id' => $key,
@@ -192,19 +185,14 @@ class OrderController extends Controller
                     'price' => $row['price']
                 ]);
             }
-
-            //apabila tidak terjadi error, penyimpanan diverifikasi
             DB::commit();
 
-            //return status dan message berupa code invoice, dan menghapus cookie
             return response()->json([
                 'status' => 'success',
                 'message' => $order->invoice,
             ], 200)->cookie(Cookie::forget('cart'));
-        } catch(\Exception $e) {
-            //jika ada error, maka akan dirollback
+        } catch (\Exception $e) {
             DB::rollback();
-            //pesan gagal akan di-return
             return response()->json([
                 'status' => 'failed',
                 'message' => $e->getMessage()
