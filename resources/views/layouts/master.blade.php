@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/iCheck/flat/blue.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/morris/morris.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/jvectormap/jquery-jvectormap-1.2.2.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/datepicker/datepicker3.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/daterangepicker/daterangepicker-bs3.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}">
@@ -100,7 +99,6 @@
     <script src="{{ asset('plugins/slimScroll/jquery.slimscroll.min.js') }}"></script>
     <script src="{{ asset('plugins/fastclick/fastclick.js') }}"></script>
     <script src="{{ asset('dist/js/adminlte.js') }}"></script>
-    <script src="{{ asset('dist/js/pages/dashboard.js') }}"></script>
     <script src="{{ asset('dist/js/demo.js') }}"></script>
     @yield('js')
 </body>
