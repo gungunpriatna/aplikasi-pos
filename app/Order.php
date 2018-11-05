@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $guarded = [];
-    protected $dates = [];
+    protected $dates = ['created_at'];
+
+    public function order_detail()
+    {
+        return $this->hasMany(Order_detail::class);
+    }
 
     public function customer()
     {
@@ -17,11 +22,5 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    //Model relationships ke order_detail menggunakan hasMany
-    public function order_detail()
-    {
-        return $this->hasMany(Order_detail::class);
     }
 }
